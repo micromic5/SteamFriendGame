@@ -7,7 +7,7 @@ $steamid = "76561197977068643";
 //basic user information
 $api_url_user_info = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=$api_key&steamids=$steamid";
 $json = json_decode(file_get_contents($api_url_user_info), true);
-echo "Wellcome ".$json["response"]["players"][0]["personaname"];
+//echo "Wellcome ".$json["response"]["players"][0]["personaname"];
 $join_date = date("D, M j, Y", $json["response"]["players"][0]["timecreated"]);
 
 function personaState($state)
@@ -53,32 +53,50 @@ $owned_games_array = [];
 $owned_games_ids_string = "";
 $steam_url_game_info = "https://store.steampowered.com/api/appdetails?appids=";
 $gameCounter = 0;
-
+//gameInfo.json file contains infos(genre,categorie,price) over steam games
 $str = file_get_contents('gameInfo.json');
 $json_current_game_info = json_decode($str, true); // decode the JSON into an associative array
+//var_dump($json_current_game_info);
 $first_row_write_into_file = true;
 $do_break = false;
+$do_break_counter = 0;  //if I have to make to many steam request give it a break and start over
 $write_into_file ="";
-$myfile = fopen("gameInfo.json", "w") or die("Unable to open file!");
+$should_write_into_file = false;
+//gather information about all games of one user
 foreach($json_games_owned["response"]["games"] as $game_owned)
 {
     array_push($owned_games_array,$game_owned["appid"]);
     $categories = "";
     $genres = "";
     $price = 0;
+    //found the needed infos inside the gameInfo.json file
     if(!is_null($json_current_game_info) && array_key_exists($game_owned["appid"],$json_current_game_info))
     {
         //im array nach appid suchen und geld, spiele kategorienzusammenrechnen usw.
         $price = $json_current_game_info[$game_owned["appid"]]["price"];
+        echo "existing in array ".($gameCounter+$free_games)."<br>";
     }
     else
     {
+        $do_break_counter++;
+        if($do_break_counter > 500)
+        {
+            echo "counted request, to many requests";
+            echo "<script>setTimeout(function(){ location.reload(); }, 30000);</script>";
+            $do_break = true;
+        }
+        //open the file to write new infos into it
+        if(!$should_write_into_file){
+            $should_write_into_file = true;
+            $myfile = fopen("gameInfo.json", "w") or die("Unable to open file!");
+        }
         try{
             $content = file_get_contents($steam_url_game_info.$game_owned["appid"]."&filters=categories,genres,price_overview");
+            sleep(3);
             if($content === false)
             {
                 echo "false don't know why";
-                echo "<script>setTimeout(function(){ location.reload(); }, 60000);</script>";
+                echo "<script>setTimeout(function(){ location.reload(); }, 30000);</script>";
                 $do_break = true;
             }
             else
@@ -89,11 +107,13 @@ foreach($json_games_owned["response"]["games"] as $game_owned)
         catch(Exception $e)
         {
             echo "propably too many requests";
-            echo "<script>setTimeout(function(){ location.reload(); }, 60000);</script>";
+            echo "<script>setTimeout(function(){ location.reload(); }, 30000);</script>";
             $do_break = true;
         }
+        //found new infos which weren't in the file
         if(!$do_break && $json_new_game_info[$game_owned["appid"]]["success"])
         {
+            echo "found new in array ".($gameCounter+$free_games)."<br>";
             if(array_key_exists("categories",$json_new_game_info[$game_owned["appid"]]["data"]))
             {
                 foreach($json_new_game_info[$game_owned["appid"]]["data"]["categories"] as $categorie)
@@ -124,7 +144,21 @@ foreach($json_games_owned["response"]["games"] as $game_owned)
                 $write_into_file .="{\"".$game_owned["appid"]."\":{\"categories\":[".$categories."],\"genres\":[".$genres."],\"price\":".$price."}";
                 $first_row_write_into_file = false;
             }
-            //$do_break++;
+        }
+        else
+        {
+            $price = -1;
+            if(!$first_row_write_into_file)
+            {
+                $write_into_file .=",";
+                $write_into_file .="\"".$game_owned["appid"]."\":{\"categories\":[".$categories."],\"genres\":[".$genres."],\"price\":".$price."}";
+            }
+            else
+            {
+                $write_into_file .="{\"".$game_owned["appid"]."\":{\"categories\":[".$categories."],\"genres\":[".$genres."],\"price\":".$price."}";
+                $first_row_write_into_file = false;
+            }
+            echo "not found in array ".($gameCounter+$free_games)."<br>";
         }
     }
     //genre und kategorie speichern damit ich nacher anfragen sparen kann die bereits gemachten anfragen in ein file speichern bzw array und so nicht so viele Anfragen haben.
@@ -137,6 +171,10 @@ foreach($json_games_owned["response"]["games"] as $game_owned)
     {
         $money_used_for_Games += $price;
         $gameCounter++;
+    }
+    elseif($price == -1)
+    {
+        echo "game was not found and has no price";
     }
     else
     {
@@ -153,11 +191,10 @@ foreach($json_games_owned["response"]["games"] as $game_owned)
     }*/
     if($do_break)
     {
-        writeFile($write_into_file,$str,$myfile);
         break;
     }
 }
-if(!$do_break)
+if($should_write_into_file)
 {
     writeFile($write_into_file,$str,$myfile);
 }
@@ -170,16 +207,20 @@ echo "<br/>overall Time played: ".($overall_time/60);
 
 function writeFile($write_into_file,$str,$myfile)
 {
-    if(strlen($write_into_file)>0)
+
+    if(strlen($write_into_file) > 0 && strlen($str) > 0)
     {
-        if(strlen($str)>0)
-        {
-            $write_into_file .= ",".substr($str, 1);
-        }
-        else
-        {
-            $write_into_file .= "}";
-        }
+        $write_into_file .= ",".substr($str, 1);
+        fwrite($myfile, $write_into_file);
+    }
+    else if(strlen($write_into_file) > 0)
+    {
+        $write_into_file .= "}";
+        fwrite($myfile, $write_into_file);
+    }
+    else if(strlen($str) > 0)
+    {
+        $write_into_file = $str;
         fwrite($myfile, $write_into_file);
     }
     fclose($myfile);
@@ -202,10 +243,6 @@ function countMoney($owned_games_ids_string) {
         }
     }
 }
-
-
-
-
 
 
 
@@ -267,5 +304,5 @@ echo ($overall_time/60);*/
     //
     //https://store.steampowered.com/api/appdetails?appids=440&filters=categories
     //https://store.steampowered.com/api/appdetails?appids=440,438640,417800&cc=us&filters=price_overview
-?></body>
+?><p>test</p></body>
 </html>

@@ -18,7 +18,7 @@
             if(array_key_exists("realname",$json["response"]["players"][0]) != null)
             {
             ?>
-            <li>Real Name: 
+            <li>Real Name:
                 <?= $json["response"]["players"][0]["realname"];?>
             </li>
             <?php
