@@ -35,6 +35,11 @@
                 <li>Owns: <?=$user[2];?> games</li>
                 <li>Owned Games value: <?=$user[3];?> Fr.</li>
                 <li>Overall Time played: <?=$user[4];?></li>
+                <li>Free Games Time played: <?=$user[7];?></li>
+                <li>Owned Games Time played: <?=$user[8];?></li>
+                <li>Games played over 100 hours: <?=$user[9];?></li>
+                <li>Most Played Game: <?=$user[10][1]."   ".($user[10][0]/60)."   ".(($user[10][2]/100)==0?"Free":($user[10][2]/100)." Fr.")?></li>
+                <img src='<?=  json_decode(file_get_contents("https://store.steampowered.com/api/appdetails?appids=".$user[10][1]."&filters=basic"),true)[$user[10][1]]["data"]["header_image"];?>'>
             </ul>
         <?php
             }

@@ -3,7 +3,7 @@
 ini_set('max_execution_time', 3000);
 //setup
 $api_key = "D50A7D85688E2A0688F03F404F8291E1";
-$steamid = "76561198047660789";
+$steamid = "76561197977068643";
 $steam_url_game_info = "https://store.steampowered.com/api/appdetails?appids=";
 //76561197977068643 Thecell
 //76561198047660789 Kylar
@@ -52,9 +52,12 @@ function processUserInformation($steamid)
     $api_url_games_owned = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=".$GLOBALS['api_key']."&steamid=$steamid&include_played_free_games=1&format=json";
     $json_games_owned = json_decode(file_get_contents($api_url_games_owned), true);
     $overall_time = 0;
-
+    $free_games_time = 0;
+    $owned_games_time = 0;
     $free_games = 0;
     $money_used_for_Games = 0;
+    $count_games_played_over_hounderd_hours = 0;
+    $most_played_game = [0,220,0];
     //$owned_games_array = [];
     //$owned_games_ids_string = "";
     $game_counter = 0;
@@ -71,18 +74,20 @@ function processUserInformation($steamid)
             {
                 //im array nach appid suchen und geld, spiele kategorienzusammenrechnen usw.
                 $price = $GLOBALS['json_current_game_info'][$game_owned["appid"]]["price"];
-                echo "existing in array ".($game_counter+$free_games)."<br>";
+                //echo "existing in array ".($game_counter+$free_games)."<br>";
             }
             else
             {
+                echo "something new<br>";
                 $GLOBALS['do_break_counter']++;
-                if($GLOBALS['do_break_counter'] > 500 || (time()-$GLOBALS['start_time'])>180)
+                echo $GLOBALS['do_break_counter'];
+                if($GLOBALS['do_break_counter'] > 50 || (time()-$GLOBALS['start_time'])>180)
                 {
                     if((time()-$GLOBALS['start_time'])>180)
                     {
-                        echo "blasdjklgflöskafj sdfklöldasjf sdakölfkdsaö lfsadfklödsakflö";
+                        echo "blasdjklgflöskafj sdfklöldasjf sdakölfkdsaö lfsadfklödsakflöaaaaaaaaa";
                     }
-                    echo "counted request, to many requests or to much time passed";
+                    echo "break counter over 500 or to much time passed";
                     echo "<script>setTimeout(function(){ location.reload(); }, 30000);</script>";
                     $GLOBALS['do_break'] = true;
                 }
@@ -115,7 +120,8 @@ function processUserInformation($steamid)
                 //found new infos which weren't in the file, prepare string to write new info into the file
                 if(!$GLOBALS['do_break'] && $json_new_game_info[$game_owned["appid"]]["success"])
                 {
-                    echo "found new in array <br>";
+                    echo "could find the new thing online<br>";
+                    //echo "found new in array <br>";
                     if(array_key_exists("categories",$json_new_game_info[$game_owned["appid"]]["data"]))
                     {
                         foreach($json_new_game_info[$game_owned["appid"]]["data"]["categories"] as $categorie)
@@ -150,6 +156,7 @@ function processUserInformation($steamid)
                 //prepare string to write that info to this appid couldn't be found
                 else
                 {
+                    echo "wasn't able to find the new thing online<br>";
                     $price = -1;
                     if(!$GLOBALS['first_row_write_into_file'])
                     {
@@ -161,7 +168,7 @@ function processUserInformation($steamid)
                         $GLOBALS['write_into_file'] .="{\"".$game_owned["appid"]."\":{\"categories\":[".$categories."],\"genres\":[".$genres."],\"price\":".$price."}";
                         $GLOBALS['first_row_write_into_file'] = false;
                     }
-                    echo "not found in array and not found in steam request aka. no success<br>";
+                    //echo "not found in array and not found in steam request aka. no success<br>";
                 }
             }
             //genre und kategorie speichern damit ich nacher anfragen sparen kann die bereits gemachten anfragen in ein file speichern bzw array und so nicht so viele Anfragen haben.
@@ -171,15 +178,24 @@ function processUserInformation($steamid)
             //$owned_games_ids_string = $owned_games_ids_string.$game_owned["appid"].",";
             //calculate the overall play time of a user
             $overall_time += $game_owned["playtime_forever"];
+            //calculate how many games were played over 100 hours
+            $count_games_played_over_hounderd_hours += ($game_owned["playtime_forever"]/60)>=100?1:0;
+            //detect the most played game of this user
+            $most_played_game = $most_played_game[0] < $game_owned["playtime_forever"]?[$game_owned["playtime_forever"],$game_owned["appid"],$price]:$most_played_game;
             //calculate how many free games a user played and how many games he bought
             if($price > 0)
             {
+                $owned_games_time += $game_owned["playtime_forever"];
                 $money_used_for_Games += $price;
                 $game_counter++;
             }
             elseif($price == 0)
             {
+                $free_games_time += $game_owned["playtime_forever"];
                 $free_games++;
+            }else{
+                $game_counter++;
+                $owned_games_time += $game_owned["playtime_forever"];
             }
             /*elseif($price == -1)
             {
@@ -211,7 +227,7 @@ function processUserInformation($steamid)
         $json_user_info = json_decode(file_get_contents($api_url_user_info), true);
         //echo "Wellcome ".$json["response"]["players"][0]["personaname"];
         $join_date = date("D, M j, Y", $json_user_info["response"]["players"][0]["timecreated"]);
-        return [$steamid,$free_games,$game_counter,($money_used_for_Games/100),($overall_time/60),$json_user_info,$join_date];
+        return [$steamid,$free_games,$game_counter,($money_used_for_Games/100),($overall_time/60),$json_user_info,$join_date,($free_games_time/60),($owned_games_time/60),$count_games_played_over_hounderd_hours,$most_played_game];
     }
     else
     {
