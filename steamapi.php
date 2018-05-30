@@ -3,7 +3,7 @@
 ini_set('max_execution_time', 3000);
 //setup
 $api_key = "D50A7D85688E2A0688F03F404F8291E1";
-$steamid = "76561197977068643";
+$steamid = "76561198047660789";
 $steam_url_game_info = "https://store.steampowered.com/api/appdetails?appids=";
 //76561197977068643 Thecell
 //76561198047660789 Kylar
@@ -13,13 +13,14 @@ $json_friends = json_decode(file_get_contents($api_url_friends), true);
 //gameInfo.json file contains infos(genre,categorie,price) from the to me known steam games
 $str = file_get_contents('gameInfo.json');
 $json_current_game_info = json_decode($str, true); // decode the JSON into an associative array
-//stuffe used to write into the gameInfo.json file if new information is found
+//stuffe used to write into the gameInfo.json file if new information is foundsteamapi.php
 $first_row_write_into_file = true;
 $do_break = false;
 $do_break_counter = 0;  //if I have to make to many steam request give it a break and start over
 $write_into_file ="";
 $should_write_into_file = false;
 $myfile;
+$genre_array = [];
 $start_time = time();
 //context for timeout is used on the information requests on steam
 /*$ctx = stream_context_create(array('http'=>
@@ -57,6 +58,15 @@ function processUserInformation($steamid)
     $free_games = 0;
     $money_used_for_Games = 0;
     $count_games_played_over_hounderd_hours = 0;
+    $count_simulation_game_hours = 0;
+    $count_action_game_hours = 0;
+    $count_strategy_game_hours = 0;
+    $count_rpg_game_hours = 0;
+    $count_racing_game_hours = 0;
+    $count_adventure_game_hours = 0;
+    $count_massivelymultiplayer_game_hours = 0;
+    $count_sports_hours = 0;
+    $count_others_game_hours = 0;
     $most_played_game = [0,220,0];
     //$owned_games_array = [];
     //$owned_games_ids_string = "";
@@ -75,13 +85,53 @@ function processUserInformation($steamid)
                 //im array nach appid suchen und geld, spiele kategorienzusammenrechnen usw.
                 $price = $GLOBALS['json_current_game_info'][$game_owned["appid"]]["price"];
                 //echo "existing in array ".($game_counter+$free_games)."<br>";
+                foreach($GLOBALS['json_current_game_info'][$game_owned["appid"]]["genres"] as $genre){
+                    if (in_array($genre,$GLOBALS['genre_array']) == false) {
+                        array_push($GLOBALS['genre_array'],$genre);
+                    }
+                }
+                $divider = sizeof($GLOBALS['json_current_game_info'][$game_owned["appid"]]["genres"]);
+                foreach($GLOBALS['json_current_game_info'][$game_owned["appid"]]["genres"] as $genre){
+                    switch($genre){
+                        case "Action":
+                            $count_action_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                        break;
+                        case "Simulation":
+                            $count_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                        break;
+                        case "Strategy":
+                            $count_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                        break;
+                        case "RPG":
+                            $count_rpg_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                        break;
+                        case "Racing":
+                            $count_racing_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                        break;
+                        case "Adventure":
+                            $count_adventure_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                        break;
+                        case "Massively Multiplayer":
+                            $count_massivelymultiplayer_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                        break;
+                        case "Sports":
+                            $count_sports_hours += $game_owned["playtime_forever"]/60/$divider;
+                        break;
+                        default:
+                            $count_others_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                        break;
+                    }
+                }
+                /*if(in_array("Action",$GLOBALS['json_current_game_info'][$game_owned["appid"]]["genres"])){
+                    $count_action_game_hours += $game_owned["playtime_forever"]/60/sizeof($GLOBALS['json_current_game_info'][$game_owned["appid"]]["genres"]);
+                }*/
             }
             else
             {
                 echo "something new<br>";
                 $GLOBALS['do_break_counter']++;
                 echo $GLOBALS['do_break_counter'];
-                if($GLOBALS['do_break_counter'] > 50 || (time()-$GLOBALS['start_time'])>180)
+                if($GLOBALS['do_break_counter'] > 500 || (time()-$GLOBALS['start_time'])>180)
                 {
                     if((time()-$GLOBALS['start_time'])>180)
                     {
@@ -227,7 +277,7 @@ function processUserInformation($steamid)
         $json_user_info = json_decode(file_get_contents($api_url_user_info), true);
         //echo "Wellcome ".$json["response"]["players"][0]["personaname"];
         $join_date = date("D, M j, Y", $json_user_info["response"]["players"][0]["timecreated"]);
-        return [$steamid,$free_games,$game_counter,($money_used_for_Games/100),($overall_time/60),$json_user_info,$join_date,($free_games_time/60),($owned_games_time/60),$count_games_played_over_hounderd_hours,$most_played_game];
+        return [$steamid,$free_games,$game_counter,($money_used_for_Games/100),($overall_time/60),$json_user_info,$join_date,($free_games_time/60),($owned_games_time/60),$count_games_played_over_hounderd_hours,$most_played_game,$count_simulation_game_hours,$count_action_game_hours,$count_strategy_game_hours,$count_rpg_game_hours,$count_racing_game_hours,$count_adventure_game_hours,$count_massivelymultiplayer_game_hours,$count_sports_hours,$count_others_game_hours];
     }
     else
     {
