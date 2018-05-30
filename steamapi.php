@@ -1,4 +1,4 @@
-<html><body><?php
+<?php
 //server request timeout after 3000seconds
 ini_set('max_execution_time', 3000);
 //setup
@@ -67,6 +67,15 @@ function processUserInformation($steamid)
     $count_massivelymultiplayer_game_hours = 0;
     $count_sports_hours = 0;
     $count_others_game_hours = 0;
+    $count_free_simulation_game_hours = 0;
+    $count_free_action_game_hours = 0;
+    $count_free_strategy_game_hours = 0;
+    $count_free_rpg_game_hours = 0;
+    $count_free_racing_game_hours = 0;
+    $count_free_adventure_game_hours = 0;
+    $count_free_massivelymultiplayer_game_hours = 0;
+    $count_free_sports_hours = 0;
+    $count_free_others_game_hours = 0;
     $most_played_game = [0,220,0];
     //$owned_games_array = [];
     //$owned_games_ids_string = "";
@@ -92,34 +101,66 @@ function processUserInformation($steamid)
                 }
                 $divider = sizeof($GLOBALS['json_current_game_info'][$game_owned["appid"]]["genres"]);
                 foreach($GLOBALS['json_current_game_info'][$game_owned["appid"]]["genres"] as $genre){
-                    switch($genre){
-                        case "Action":
-                            $count_action_game_hours += $game_owned["playtime_forever"]/60/$divider;
-                        break;
-                        case "Simulation":
-                            $count_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
-                        break;
-                        case "Strategy":
-                            $count_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
-                        break;
-                        case "RPG":
-                            $count_rpg_game_hours += $game_owned["playtime_forever"]/60/$divider;
-                        break;
-                        case "Racing":
-                            $count_racing_game_hours += $game_owned["playtime_forever"]/60/$divider;
-                        break;
-                        case "Adventure":
-                            $count_adventure_game_hours += $game_owned["playtime_forever"]/60/$divider;
-                        break;
-                        case "Massively Multiplayer":
-                            $count_massivelymultiplayer_game_hours += $game_owned["playtime_forever"]/60/$divider;
-                        break;
-                        case "Sports":
-                            $count_sports_hours += $game_owned["playtime_forever"]/60/$divider;
-                        break;
-                        default:
-                            $count_others_game_hours += $game_owned["playtime_forever"]/60/$divider;
-                        break;
+                    if($price > 0){
+                        switch($genre){
+                            case "Action":
+                                $count_action_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Simulation":
+                                $count_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Strategy":
+                                $count_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "RPG":
+                                $count_rpg_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Racing":
+                                $count_racing_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Adventure":
+                                $count_adventure_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Massively Multiplayer":
+                                $count_massivelymultiplayer_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Sports":
+                                $count_sports_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            default:
+                                $count_others_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                        }
+                    }else{
+                        switch($genre){
+                            case "Action":
+                                $count_free_action_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Simulation":
+                                $count_free_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Strategy":
+                                $count_free_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "RPG":
+                                $count_free_rpg_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Racing":
+                                $count_free_racing_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Adventure":
+                                $count_free_adventure_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Massively Multiplayer":
+                                $count_free_massivelymultiplayer_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            case "Sports":
+                                $count_free_sports_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                            default:
+                                $count_free_others_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                            break;
+                        }
                     }
                 }
                 /*if(in_array("Action",$GLOBALS['json_current_game_info'][$game_owned["appid"]]["genres"])){
@@ -277,7 +318,7 @@ function processUserInformation($steamid)
         $json_user_info = json_decode(file_get_contents($api_url_user_info), true);
         //echo "Wellcome ".$json["response"]["players"][0]["personaname"];
         $join_date = date("D, M j, Y", $json_user_info["response"]["players"][0]["timecreated"]);
-        return [$steamid,$free_games,$game_counter,($money_used_for_Games/100),($overall_time/60),$json_user_info,$join_date,($free_games_time/60),($owned_games_time/60),$count_games_played_over_hounderd_hours,$most_played_game,$count_simulation_game_hours,$count_action_game_hours,$count_strategy_game_hours,$count_rpg_game_hours,$count_racing_game_hours,$count_adventure_game_hours,$count_massivelymultiplayer_game_hours,$count_sports_hours,$count_others_game_hours];
+        return [$steamid,$free_games,$game_counter,($money_used_for_Games/100),($overall_time/60),$json_user_info,$join_date,($free_games_time/60),($owned_games_time/60),$count_games_played_over_hounderd_hours,$most_played_game,$count_simulation_game_hours,$count_action_game_hours,$count_strategy_game_hours,$count_rpg_game_hours,$count_racing_game_hours,$count_adventure_game_hours,$count_massivelymultiplayer_game_hours,$count_sports_hours,$count_others_game_hours,$count_free_simulation_game_hours,$count_free_action_game_hours,$count_free_strategy_game_hours,$count_free_rpg_game_hours,$count_free_racing_game_hours,$count_free_adventure_game_hours,$count_free_massivelymultiplayer_game_hours,$count_free_sports_hours,$count_free_others_game_hours];
     }
     else
     {
@@ -421,5 +462,4 @@ echo ($overall_time/60);*/
     //
     //return friends
     //http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=D50A7D85688E2A0688F03F404F8291E1&steamid=76561198047660789
-?></body>
-</html>
+?>

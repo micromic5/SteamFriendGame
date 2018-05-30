@@ -1,0 +1,107 @@
+body{
+	margin:0;
+	width:100vw;
+	height:100vh;
+}
+.backgroundImages{
+	width:100%;
+	height:100%;
+	position:fixed;
+
+}
+#scaleBlue{
+	animation-name: scaleBlue;
+    animation-duration: 4s;
+    animation-delay: 4s;
+    animation-fill-mode: forwards;
+}
+#scaleYellow{
+	animation-name: scaleYellow;
+    animation-duration: 4s;
+    animation-delay: 4s;
+    animation-fill-mode: forwards;
+}
+#titlePosition{
+	margin-left:50%;
+	padding-top:39vh;
+	position:absolute;
+	animation-name: positionTitle;
+    animation-duration: 4s;
+    animation-delay: 4s;
+    animation-fill-mode: forwards;
+}
+#titleRotation{
+ 	transform: rotate(3deg);
+  	font-family: 'Allerta';
+  	font-size:3em;
+  	animation-name: rotationTitle;
+    animation-duration: 4s;
+    animation-delay: 4s;
+    animation-fill-mode: forwards;
+}
+#infoText{
+	font-family: 'PT Sans';
+	margin-top:2%;
+	width:40vh;
+	opacity: 0;
+  	animation-name: infoText;
+    animation-duration: 2s;
+    animation-delay: 8s;
+    animation-fill-mode: forwards;
+}
+#furtherIcon{
+	margin-top:2%;
+}
+@keyframes infoText {
+    0%   {opacity: 0;}
+    100% {opacity:1;}
+}
+@keyframes positionTitle {
+    0%   {margin-left:50%;padding-top:39vh;}
+    100% {margin-left:35%;padding-top:30vh}
+}
+@keyframes rotationTitle {
+    0%   {transform: rotate(3deg)}
+    100% {transform: rotate(0deg)}
+}
+@keyframes scaleBlue {
+    0%   {width: 100%;}
+    100% {width: 40%;}
+}
+@keyframes scaleYellow {
+    0%   {height: 100%;}
+    100% {height: 40%;}
+}
+/*
+#backgroundBlue{
+	background-image: url("backgroundBlue1.png");
+	width:100%;
+	height:100%;
+}
+#backgroundYelwo{
+	background-image: url("backgorundYelow.png");
+	width:100%;
+	height:100%;
+}*/
+
+#backgroundBlueInfo{
+	background: #15415D;
+	width:10px;
+	height:20px;
+}
+
+#backgroundBlueInfo2{
+	background:#106FAC;
+	width:10px;
+	height:20px;
+}
+
+#backgroundYellowInfo{
+	background:#F9B233;
+	width:10px;
+	height:20px;
+}
+
+.colorInfo{
+	margin-top:3px;
+}
