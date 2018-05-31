@@ -76,6 +76,15 @@ function processUserInformation($steamid)
     $count_free_massivelymultiplayer_game_hours = 0;
     $count_free_sports_hours = 0;
     $count_free_others_game_hours = 0;
+    $count_simulation_game_value = 0;
+    $count_action_game_value = 0;
+    $count_strategy_game_value = 0;
+    $count_rpg_game_value = 0;
+    $count_racing_game_value = 0;
+    $count_adventure_game_value = 0;
+    $count_massivelymultiplayer_game_value = 0;
+    $count_sports_game_value = 0;
+    $count_others_game_value = 0;
     $most_played_game = [0,220,0];
     //$owned_games_array = [];
     //$owned_games_ids_string = "";
@@ -104,30 +113,39 @@ function processUserInformation($steamid)
                     if($price > 0){
                         switch($genre){
                             case "Action":
+                                $count_action_game_value += $price/$divider;
                                 $count_action_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             case "Simulation":
+                                $count_simulation_game_value += $price/$divider;
                                 $count_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             case "Strategy":
-                                $count_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                                $count_strategy_game_value += $price/$divider;
+                                $count_strategy_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             case "RPG":
+                                $count_rpg_game_value += $price/$divider;
                                 $count_rpg_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             case "Racing":
+                                $count_racing_game_value += $price/$divider;
                                 $count_racing_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             case "Adventure":
+                                $count_adventure_game_value += $price/$divider;
                                 $count_adventure_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             case "Massively Multiplayer":
+                                $count_massivelymultiplayer_game_value += $price/$divider;
                                 $count_massivelymultiplayer_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             case "Sports":
+                                $count_sports_game_value += $price/$divider;
                                 $count_sports_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             default:
+                                $count_others_game_value += $price/$divider;
                                 $count_others_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                         }
@@ -140,7 +158,7 @@ function processUserInformation($steamid)
                                 $count_free_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             case "Strategy":
-                                $count_free_simulation_game_hours += $game_owned["playtime_forever"]/60/$divider;
+                                $count_free_strategy_game_hours += $game_owned["playtime_forever"]/60/$divider;
                             break;
                             case "RPG":
                                 $count_free_rpg_game_hours += $game_owned["playtime_forever"]/60/$divider;
@@ -318,7 +336,7 @@ function processUserInformation($steamid)
         $json_user_info = json_decode(file_get_contents($api_url_user_info), true);
         //echo "Wellcome ".$json["response"]["players"][0]["personaname"];
         $join_date = date("D, M j, Y", $json_user_info["response"]["players"][0]["timecreated"]);
-        return [$steamid,$free_games,$game_counter,($money_used_for_Games/100),($overall_time/60),$json_user_info,$join_date,($free_games_time/60),($owned_games_time/60),$count_games_played_over_hounderd_hours,$most_played_game,$count_simulation_game_hours,$count_action_game_hours,$count_strategy_game_hours,$count_rpg_game_hours,$count_racing_game_hours,$count_adventure_game_hours,$count_massivelymultiplayer_game_hours,$count_sports_hours,$count_others_game_hours,$count_free_simulation_game_hours,$count_free_action_game_hours,$count_free_strategy_game_hours,$count_free_rpg_game_hours,$count_free_racing_game_hours,$count_free_adventure_game_hours,$count_free_massivelymultiplayer_game_hours,$count_free_sports_hours,$count_free_others_game_hours];
+        return [$steamid,$free_games,$game_counter,($money_used_for_Games/100),($overall_time/60),$json_user_info,$join_date,($free_games_time/60),($owned_games_time/60),$count_games_played_over_hounderd_hours,$most_played_game,$count_simulation_game_hours,$count_action_game_hours,$count_strategy_game_hours,$count_rpg_game_hours,$count_racing_game_hours,$count_adventure_game_hours,$count_massivelymultiplayer_game_hours,$count_sports_hours,$count_others_game_hours,$count_free_simulation_game_hours,$count_free_action_game_hours,$count_free_strategy_game_hours,$count_free_rpg_game_hours,$count_free_racing_game_hours,$count_free_adventure_game_hours,$count_free_massivelymultiplayer_game_hours,$count_free_sports_hours,$count_free_others_game_hours,$count_simulation_game_value/100,$count_action_game_value/100,$count_strategy_game_value/100,$count_rpg_game_value/100,$count_racing_game_value/100,$count_adventure_game_value/100,$count_massivelymultiplayer_game_value/100,$count_sports_game_value/100,$count_others_game_value/100];
     }
     else
     {

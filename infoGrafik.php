@@ -1,13 +1,122 @@
 <?php include("steamapi.php");?>
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-    </head>
+<meta charset="utf-8">
+<html lang="de">
+<head>
+</head>
+<style>
+.dimension { cursor: ns-resize; }
+.category { cursor: ew-resize; }
+.dimension tspan.name { font-size: 1.5em; fill: #333; font-weight: bold; }
+.dimension tspan.sort { fill: #000; cursor: pointer; opacity: 0; }
+.dimension tspan.sort:hover { fill: #333; }
+.dimension:hover tspan.name { fill: #000; }
+.dimension:hover tspan.sort { opacity: 1; }
+.dimension line { stroke: #000; }
+.dimension rect { stroke: none; fill-opacity: 0; }
+.dimension > rect, .category-background { fill: #fff; }
+.dimension > rect { display: none; }
+.category:hover rect { fill-opacity: .3; }
+.dimension:hover > rect { fill-opacity: .3; }
+.ribbon path { stroke-opacity: 0; fill-opacity: .9; }
+.ribbon path.active { fill-opacity: .9; }
+.ribbon-mouse path { fill-opacity: 0; }
+
+.category-0 { fill: #15415D; stroke: #15415D; }
+.category-1 { fill: #106FAC; stroke: #106FAC; }
+.category-2 { fill: #F9B233; stroke: #F9B233; }
+.category-3 { fill: #d62728; stroke: #d62728; }
+.category-4 { fill: #9467bd; stroke: #9467bd; }
+.category-5 { fill: #8c564b; stroke: #8c564b; }
+.category-6 { fill: #e377c2; stroke: #e377c2; }
+.category-7 { fill: #7f7f7f; stroke: #7f7f7f; }
+.category-8 { fill: #bcbd22; stroke: #bcbd22; }
+.category-9 { fill: #17becf; stroke: #17becf; }
+
+.tooltip {
+  background-color: rgba(242, 242, 242, .6);
+  position: absolute;
+  padding: 5px;
+}
+
+body {
+  font-family: sans-serif;
+  font-size: 16px;
+  position: relative;
+}
+h1, h2, .dimension text {
+  text-align: center;
+  font-family: "PT Sans", Helvetica;
+  font-weight: 300;
+}
+h1 {
+  font-size: 4em;
+  margin: .5em 0 0 0;
+}
+h2 {
+  font-size: 2em;
+  margin: 1em 0 0.5em;
+  border-bottom: solid #ccc 1px;
+}
+p.meta, p.footer {
+  font-size: 13px;
+  color: #333;
+}
+p.meta {
+  text-align: center;
+}
+
+text.icicle { pointer-events: none; }
+
+.options { font-size: 12px; text-align: center; padding: 5px 0; }
+.curves { float: left; }
+.source { float: right; }
+pre, code { font-family: "Menlo", monospace; }
+
+.html .value,
+.javascript .string,
+.javascript .regexp {
+  color: #756bb1;
+}
+
+.html .tag,
+.css .tag,
+.javascript .keyword {
+  color: #3182bd;
+}
+
+.comment {
+  color: #636363;
+}
+
+.html .doctype,
+.javascript .number {
+  color: #31a354;
+}
+
+.html .attribute,
+.css .attribute,
+.javascript .class,
+.javascript .special {
+  color: #e6550d;
+}
+#visol{
+    transform: rotate(180deg);
+    margin:0;
+    left:0;
+}
+#visol .category-0 { fill: #F9B233; stroke: #F9B233; }
+#visol .ribbon path{opacity: 1}
+</style>
+
     <body>
 
         <?php
+        $chart_data = "[";
+        $chart_data_money = "[";
         foreach($users_array as $user)
         {
+            var_dump($user[0]);echo "<br>";
             if($user[0]!=0){
             ?>
             <h1><?=$user[5]["response"]["players"][0]["personaname"];?></h1>
@@ -60,8 +169,119 @@
                 <img src='<?=  json_decode(file_get_contents("https://store.steampowered.com/api/appdetails?appids=".$user[10][1]."&filters=basic"),true)[$user[10][1]]["data"]["header_image"];?>'>
             </ul>
         <?php
+            $gamer_name = $user[5]["response"]["players"][0]["personaname"];
+            //prepare data payed simulation game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Simulation",$user[11],"Payed");
+            //prepare data payed Action game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Action",$user[12],"Payed");
+            //prepare data payed Strategy game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Strategy",$user[13],"Payed");
+            //prepare data payed RPG game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"RPG",$user[14],"Payed");
+            //prepare data payed Racing game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Racing",$user[15],"Payed");
+            //prepare data payed Adventure game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Adventure",$user[16],"Payed");
+            //prepare data payed MMO game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"MMO",$user[17],"Payed");
+            //prepare data payed Sports game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Sports",$user[18],"Payed");
+            //prepare data payed Other game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Other",$user[19],"Payed");
+            //prepare data free simulation game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Simulation",$user[20],"Free");
+            //prepare data free Action game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Action",$user[21],"Free");
+            //prepare data free Strategy game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Strategy",$user[22],"Free");
+            //prepare data free RPG game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"RPG",$user[23],"Free");
+            //prepare data free Racing game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Racing",$user[24],"Free");
+            //prepare data free Adventure game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Adventure",$user[25],"Free");
+            //prepare data free MMO game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"MMO",$user[26],"Free");
+            //prepare data free Sports game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Sports",$user[27],"Free");
+            //prepare data free Other game hours
+            $chart_data=generateChartData($chart_data,$gamer_name,"Other",$user[28],"Free");
+            //prepare data simulation game value
+            $chart_data_money=generateChartDataMoney($chart_data_money,$gamer_name,"Simulation",$user[29]);
+            //prepare data Action game value
+            $chart_data_money=generateChartDataMoney($chart_data_money,$gamer_name,"Action",$user[30]);
+            //prepare data Strategy game value
+            $chart_data_money=generateChartDataMoney($chart_data_money,$gamer_name,"Strategy",$user[31]);
+            //prepare data RPG game value
+            $chart_data_money=generateChartDataMoney($chart_data_money,$gamer_name,"RPG",$user[32]);
+            //prepare data Racing game value
+            $chart_data_money=generateChartDataMoney($chart_data_money,$gamer_name,"Racing",$user[33]);
+            //prepare data Adventure game value
+            $chart_data_money=generateChartDataMoney($chart_data_money,$gamer_name,"Adventure",$user[34]);
+            //prepare data MMO game value
+            $chart_data_money=generateChartDataMoney($chart_data_money,$gamer_name,"MMO",$user[35]);
+            //prepare data Sports game value
+            $chart_data_money=generateChartDataMoney($chart_data_money,$gamer_name,"Sports",$user[36]);
+            //prepare data Other game value
+            $chart_data_money=generateChartDataMoney($chart_data_money,$gamer_name,"Other",$user[37]);
             }
         }
+        $chart_data_money=substr($chart_data_money, 0, -1);
+        $chart_data_money.="]";
+        $chart_data=substr($chart_data, 0, -1);
+        $chart_data.="]";
+
+        //adds the data in an array
+        function generateChartData($chart_data,$player_name,$genre,$time,$payed){
+            for($i = 0; $i < $time; $i++){
+                $chart_data.='{"Player":"'.$player_name.'","Genre":"'.$genre.'","Play Type":"'.$payed.'"},';
+            }
+            return $chart_data;
+        }
+
+        function generateChartDataMoney($chart_data_money,$player_name,$genre,$value){
+            for($j = 0; $j < $value; $j++){
+                $chart_data_money.='{"Player":"'.$player_name.'","Genre":"'.$genre.'","Wert der gekauften Spiele":"Wert der gekauften Spiele"},';
+            }
+            return $chart_data_money;
+        }
         ?>
+    <div id="clickMe">clickMe</div>
+    <div id="vis"></div>
+    <div id="visol"></div>
+    <script src='d3.v2.js'></script>
+    <!--script src="d3.parsets.js"></script-->
+    <script src="http://www.jasondavies.com/parallel-sets/d3.parsets.js"></script>
+    <!--script src="http://www.jasondavies.com/parallel-sets/highlight.min.js"></script-->
+    <script>
+        var chart = d3.parsets()
+            .dimensions(["Play Type","Genre","Player"]);
+            chart.width(2160);
+            chart.height(540);
+        var vis = d3.select("#vis").append("svg")
+            .attr("width", chart.width())
+            .attr("height", chart.height());
+
+        vis.datum(<?=$chart_data?>).call(chart);
+        document.getElementById("clickMe").addEventListener("click", function myFunction() {
+            chart.height(1080);
+            vis.attr("height",chart.height());
+        });
+        var secondChart = d3.parsets()
+            .dimensions(["Wert der gekauften Spiele","Genre","Player"]);
+            secondChart.width(2160);
+            secondChart.height(540);
+        var visol = d3.select("#visol").append("svg")
+            .attr("width", secondChart.width())
+            .attr("height", secondChart.height());
+
+        visol.datum(<?=$chart_data_money?>).call(secondChart);
+        
+        var categorys = document.getElementsByClassName("category");
+        var i;
+        for (i = 0; i < categorys.length; i++) {
+                console.log(categorys[i].transform);
+        }
+    </script>
     </body>
 </html>

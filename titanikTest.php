@@ -2,7 +2,39 @@
 <meta charset="utf-8">
 <title>Parallel Sets - Jason Davies</title>
 <style>
-@import url(http://www.jasondavies.com/parallel-sets/d3.parsets.css);
+.dimension { cursor: ns-resize; }
+.category { cursor: ew-resize; }
+.dimension tspan.name { font-size: 1.5em; fill: #333; font-weight: bold; }
+.dimension tspan.sort { fill: #000; cursor: pointer; opacity: 0; }
+.dimension tspan.sort:hover { fill: #333; }
+.dimension:hover tspan.name { fill: #000; }
+.dimension:hover tspan.sort { opacity: 1; }
+.dimension line { stroke: #000; }
+.dimension rect { stroke: none; fill-opacity: 0; }
+.dimension > rect, .category-background { fill: #fff; }
+.dimension > rect { display: none; }
+.category:hover rect { fill-opacity: .3; }
+.dimension:hover > rect { fill-opacity: .3; }
+.ribbon path { stroke-opacity: 0; fill-opacity: .5; }
+.ribbon path.active { fill-opacity: .9; }
+.ribbon-mouse path { fill-opacity: 0; }
+
+.category-0 { fill: #1f77b4; stroke: #1f77b4; }
+.category-1 { fill: #ff7f0e; stroke: #ff7f0e; }
+.category-2 { fill: #2ca02c; stroke: #2ca02c; }
+.category-3 { fill: #d62728; stroke: #d62728; }
+.category-4 { fill: #9467bd; stroke: #9467bd; }
+.category-5 { fill: #8c564b; stroke: #8c564b; }
+.category-6 { fill: #e377c2; stroke: #e377c2; }
+.category-7 { fill: #7f7f7f; stroke: #7f7f7f; }
+.category-8 { fill: #bcbd22; stroke: #bcbd22; }
+.category-9 { fill: #17becf; stroke: #17becf; }
+
+.tooltip {
+  background-color: rgba(242, 242, 242, .6);
+  position: absolute;
+  padding: 5px;
+}
 
 body {
   font-family: sans-serif;
@@ -71,9 +103,10 @@ pre, code { font-family: "Menlo", monospace; }
 
 <body>
 <div id="vis"><!--noscript><img src="parsets.png"></noscript--></div>
-<script src="http://mbostock.github.com/d3/d3.js?2.5.0"></script>
-<script src="http://www.jasondavies.com/parallel-sets/d3.parsets.js"></script>
-<script src="http://www.jasondavies.com/parallel-sets/highlight.min.js"></script>
+<script src='d3.v2.js'></script>
+<script src="d3.parsets.js"></script>
+<!--script src="http://www.jasondavies.com/parallel-sets/d3.parsets.js"></script-->
+<!--script src="http://www.jasondavies.com/parallel-sets/highlight.min.js"></script-->
 <script>
 var chart = d3.parsets()
     .dimensions(["Play Type","Genre","Player"]);
@@ -82,11 +115,13 @@ var vis = d3.select("#vis").append("svg")
     .attr("width", chart.width())
     .attr("height", chart.height());
 
-var partition = d3.layout.partition()
+/*var partition = d3.layout.partition()
     .sort(null)
     .size([chart.width(), chart.height() * 5 / 4])
     .children(function(d) { return d.children ? d3.values(d.children) : null; })
-    .value(function(d) { return d.count; });
+    .value(function(d) { return d.count; });*/
+
+
 //var ice = false;
 
 /*function curves() {
