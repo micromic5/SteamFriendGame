@@ -8,10 +8,10 @@
         tooltip_ = defaultTooltip,
         categoryTooltip = defaultCategoryTooltip,
         value_,
-        spacing = 20,
+        spacing = 100,
         width,
         height,
-        tension = 1,
+        tension = .98,
         tension0,
         duration = 500;
 
@@ -119,16 +119,16 @@
           textEnter.append("tspan")
               .attr("class", "name")
               .text(dimensionFormatName);
-          textEnter.append("tspan")
+          /*textEnter.append("tspan")
               .attr("class", "sort alpha")
               .attr("dx", "2em")
-              .text("alpha Â»")
-              .on("mousedown.parsets", cancelEvent);
-          textEnter.append("tspan")
+              .text("alpha »")
+              .on("mousedown.parsets", cancelEvent);*/
+         /* textEnter.append("tspan")
               .attr("class", "sort size")
               .attr("dx", "2em")
-              .text("size Â»")
-              .on("mousedown.parsets", cancelEvent);
+              .text("size »")
+              .on("mousedown.parsets", cancelEvent);*/
           dimension
               .call(d3.behavior.drag()
                 .origin(identity)
@@ -173,8 +173,7 @@
                       .attr("transform", "translate(0," + d.y + ")")
                       .tween("ribbon", ribbonTweenY);
                 }));
-          dimension.select("text").select("tspan.sort.alpha")
-              .on("click.parsets", sortBy("alpha", function(a, b) { return a.name < b.name ? 1 : -1; }, dimension));
+          //sortBy("alpha", function(a, b) { return a.name < b.name ? 1 : -1; }, document.getElementsByClassName("dimension")[2]);
           dimension.select("text").select("tspan.sort.size")
               .on("click.parsets", sortBy("size", function(a, b) { return a.count - b.count; }, dimension));
           dimension.transition().duration(duration)
@@ -294,7 +293,7 @@
               })
               .on("mouseout.parsets", unhighlight)
               .on("mousedown.parsets", cancelEvent)
-              .call(d3.behavior.drag()
+              /*.call(d3.behavior.drag()
                 .origin(identity)
                 .on("dragstart", function(d) {
                   dragging = true;
@@ -315,7 +314,7 @@
                     }
                   }
                   var x = 0,
-                      p = spacing / (categories.length - 1);
+                      p = spacing / (d.categories.length/(d.categories.length>10?10:d.categories.length));
                   categories.forEach(function(e) {
                     if (d === e) e.x0 = d3.event.x;
                     e.x = x;
@@ -334,7 +333,7 @@
                   transition(d3.select(this))
                       .attr("transform", "translate(" + d.x + ")")
                       .tween("ribbon", ribbonTweenX);
-                }));
+                }))*/;
           category.transition().duration(duration)
               .attr("transform", function(d) { return "translate(" + d.x + ")"; })
               .tween("ribbon", ribbonTweenX);
@@ -482,7 +481,7 @@
       dimensions.forEach(function(d) {
         d.categories = d.categories.filter(function(d) { return d.count; });
         var x = 0,
-            p = spacing / (d.categories.length - 1);
+        p = spacing / (d.categories.length/(d.categories.length>10?10:d.categories.length));
         d.categories.forEach(function(c) {
           c.x = x;
           c.dx = c.count / total * (width - spacing);
@@ -589,7 +588,7 @@
       var t = this.textContent = text(d, i),
           w = width(d, i);
       if (this.getComputedTextLength() < w) return t;
-      this.textContent = "â€¦" + t;
+      this.textContent = "..." + t;
       var lo = 0,
           hi = t.length + 1,
           x;
@@ -598,7 +597,7 @@
         if ((x = this.getSubStringLength(0, mid)) < w) lo = mid + 1;
         else hi = mid;
       }
-      return lo > 1 ? t.substr(0, lo - 2) + "â€¦" : "";
+      return lo > 1 ? t.substr(0, lo - 2) + "..." : "";
     };
   }
 

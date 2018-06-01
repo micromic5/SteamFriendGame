@@ -101,17 +101,12 @@ pre, code { font-family: "Menlo", monospace; }
   color: #e6550d;
 }
 #visol{
-    transform: scaleY(-1);
+    transform: rotate(180deg);
     margin:0;
     left:0;
 }
 #visol text{
-    transform:scaleY(-1) translate(0,1.3em);
-    top:500px;
-    margin-top:200px;
-}
-#visol .dimension > .dimension{
-    transform:scaleY(-1) translate(0,2.5em);
+    transform: rotate(180deg);
 }
 #visol .category-0 { fill: #F9B233; stroke: #F9B233; }
 #visol .ribbon path{opacity: 1}
@@ -215,27 +210,27 @@ pre, code { font-family: "Menlo", monospace; }
             //prepare data free Other game hours
             $chart_data=generateChartData($chart_data,$gamer_name,"Other",$user[28],"Free");
             //prepare data Other game value
-            $chart_data_money.=generateChartDataMoney($gamer_name,"Other",$user[37]);
+            $chart_data_money=generateChartDataMoney($gamer_name,"Other",$user[37]).$chart_data_money;
             //prepare data Sports game value
-            $chart_data_money.=generateChartDataMoney($gamer_name,"Sports",$user[36]);
+            $chart_data_money=generateChartDataMoney($gamer_name,"Sports",$user[36]).$chart_data_money;
             //prepare data MMO game value
-            $chart_data_money.=generateChartDataMoney($gamer_name,"MMO",$user[35]);
+            $chart_data_money=generateChartDataMoney($gamer_name,"MMO",$user[35]).$chart_data_money;
             //prepare data Adventure game value
-            $chart_data_money.=generateChartDataMoney($gamer_name,"Adventure",$user[34]);
+            $chart_data_money=generateChartDataMoney($gamer_name,"Adventure",$user[34]).$chart_data_money;
             //prepare data Racing game value
-            $chart_data_money.=generateChartDataMoney($gamer_name,"Racing",$user[33]);
+            $chart_data_money=generateChartDataMoney($gamer_name,"Racing",$user[33]).$chart_data_money;
             //prepare data RPG game value
-            $chart_data_money.=generateChartDataMoney($gamer_name,"RPG",$user[32]);
+            $chart_data_money=generateChartDataMoney($gamer_name,"RPG",$user[32]).$chart_data_money;
             //prepare data Strategy game value
-            $chart_data_money.=generateChartDataMoney($gamer_name,"Strategy",$user[31]);
+            $chart_data_money=generateChartDataMoney($gamer_name,"Strategy",$user[31]).$chart_data_money;
             //prepare data Action game value
-            $chart_data_money.=generateChartDataMoney($gamer_name,"Action",$user[30]);
+            $chart_data_money=generateChartDataMoney($gamer_name,"Action",$user[30]).$chart_data_money;
             //prepare data simulation game value
-            $chart_data_money.=generateChartDataMoney($gamer_name,"Simulation",$user[29]);
+            $chart_data_money=generateChartDataMoney($gamer_name,"Simulation",$user[29]).$chart_data_money;
             }
         }
         $chart_data_money=substr($chart_data_money, 0, -1);
-        $chart_data_money.="]";
+        $chart_data_money ="[".$chart_data_money."]";
         $chart_data=substr($chart_data, 0, -1);
         $chart_data.="]";
 
@@ -243,7 +238,7 @@ pre, code { font-family: "Menlo", monospace; }
         //adds the data in an array
         function generateChartData($chart_data,$player_name,$genre,$time,$payed){
             for($i = 0; $i < $time; $i++){
-                $chart_data.='{"Spieler":"'.$player_name.'","Genre":"'.$genre.'","Spielart":"'.$payed.'"},';
+                $chart_data.='{"Player":"'.$player_name.'","Genre":"'.$genre.'","Play Type":"'.$payed.'"},';
             }
             return $chart_data;
         }
@@ -251,13 +246,14 @@ pre, code { font-family: "Menlo", monospace; }
         function generateChartDataMoney($player_name,$genre,$value){
             $chart_data_money_new = "";
             for($j = 0; $j < $value; $j++){
-                $chart_data_money_new.='{"Spieler":"'.$player_name.'","Genre":"'.$genre.'","Wert der gekauften Spiele":"Gesamt Betrag in Fr."},';
+                $chart_data_money_new.='{"Player":"'.$player_name.'","Genre":"'.$genre.'","Wert der gekauften Spiele":"Wert der gekauften Spiele"},';
             }
             return $chart_data_money_new;
         }
         ?>
     <div id="clickMe">clickMe</div>
     <div id="vis"></div>
+    <br>
     <div id="visol" style="position:absolute"></div>
     <script src='d3.v2.js'></script>
     <script src="d3.parsets.js"></script>
@@ -265,7 +261,7 @@ pre, code { font-family: "Menlo", monospace; }
     <!--script src="http://www.jasondavies.com/parallel-sets/highlight.min.js"></script-->
     <script>
         var chart = d3.parsets()
-            .dimensions(["Spielart","Genre","Spieler"]);
+            .dimensions(["Play Type","Genre","Player"]);
             chart.width(1920);
             chart.height(500);
 
@@ -280,7 +276,7 @@ pre, code { font-family: "Menlo", monospace; }
         });*/
 
         var secondChart = d3.parsets()
-            .dimensions(["Wert der gekauften Spiele","Genre","Spieler"]);
+            .dimensions(["Wert der gekauften Spiele","Genre","Player"]);
             secondChart.width(1920);
             secondChart.height(500);
         var visol = d3.select("#visol").append("svg")

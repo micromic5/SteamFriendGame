@@ -5,6 +5,7 @@ ini_set('max_execution_time', 3000);
 $api_key = "D50A7D85688E2A0688F03F404F8291E1";
 $steamid = "76561198047660789";
 $steam_url_game_info = "https://store.steampowered.com/api/appdetails?appids=";
+$grapData = false;
 //76561197977068643 Thecell
 //76561198047660789 Kylar
 //freunde des nutzers
@@ -185,7 +186,7 @@ function processUserInformation($steamid)
                     $count_action_game_hours += $game_owned["playtime_forever"]/60/sizeof($GLOBALS['json_current_game_info'][$game_owned["appid"]]["genres"]);
                 }*/
             }
-            else
+            else if($grapData)
             {
                 echo "something new<br>";
                 $GLOBALS['do_break_counter']++;
@@ -281,10 +282,6 @@ function processUserInformation($steamid)
                 }
             }
             //genre und kategorie speichern damit ich nacher anfragen sparen kann die bereits gemachten anfragen in ein file speichern bzw array und so nicht so viele Anfragen haben.
-            //   $owned_games_array[$game_owned["appid"]][0] = json_decode(file_get_contents($steam_url_game_info.$game_owned["appid"]."&filters=categories,genres"), true);
-
-            //var_dump($owned_games_array[$game_owned["appid"]][0]);
-            //$owned_games_ids_string = $owned_games_ids_string.$game_owned["appid"].",";
             //calculate the overall play time of a user
             $overall_time += $game_owned["playtime_forever"];
             //calculate how many games were played over 100 hours
